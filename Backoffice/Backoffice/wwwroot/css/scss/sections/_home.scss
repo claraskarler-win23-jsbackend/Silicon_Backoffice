@@ -1,0 +1,19 @@
+.home {
+    .container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding-left: 350px;
+        padding-top: 100px;
+        .welcome-text {
+            padding-bottom: 20px
+            p {
+                color: $gray-500;
+            }
+        }
+        img {
+            height: 50%;
+            width: 50%;
+        }
+    }
+}

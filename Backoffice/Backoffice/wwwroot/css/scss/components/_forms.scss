@@ -14,15 +14,19 @@ form {
     }
 
     .input-group {
-        display: grid;
         margin-bottom: 1rem;
+        padding-top: 10px;
 
         label {
+            position: absolute;
             margin-bottom: 0.188rem;
             font-weight: 700;
+            z-index: 1;
+            bottom: 60px;
         }
 
         input {
+
             padding: 1rem;
             border-radius: 0.5rem !important;
             border: 0.1rem solid $gray-400;

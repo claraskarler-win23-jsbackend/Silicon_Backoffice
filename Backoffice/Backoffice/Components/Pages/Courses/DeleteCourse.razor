@@ -1,7 +1,106 @@
-﻿@page "/courses/delete"
+﻿@page "/courses/delete/{CourseId}"
+@inject NavigationManager NavigationManager
 
-<h3>DeleteCourse</h3>
+<h3>Delete Course</h3>
+
+@if (course != null)
+{
+    <form @onsubmit="DeleteCourseAsync">
+        <div>
+            <p>Are you sure you want to delete the course <strong>@course.Title</strong>?</p>
+            <button type="submit" class="btn btn-danger">Delete</button>
+        </div>
+    </form>
+}
+else
+{
+    <p>Loading...</p>
+}
 
 @code {
+    [Parameter]
+    public string CourseId { get; set; }
 
+    private Course course;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadCourseData();
+    }
+
+    private async Task LoadCourseData()
+    {
+        try
+        {
+            var query = new GraphQLQuery
+                {
+                    Query = $@"
+                    {{
+                        getCourseById(id: ""{CourseId}"") {{
+                            id
+                            title
+                        }}
+                    }}"
+                };
+
+            var response = await Http.PostAsJsonAsync("http://localhost:7091/api/graphql", query);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<DynamicGraphQLResponse>();
+                if (result != null)
+                {
+                    var courseData = result.Data.GetProperty("getCourseById");
+                    course = new Course
+                        {
+                            Id = courseData.GetProperty("id").GetString(),
+                            Title = courseData.GetProperty("title").GetString()
+                        };
+                }
+            }
+            else
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                Console.Error.WriteLine($"Error: {response.StatusCode} - {response.ReasonPhrase}");
+                Console.Error.WriteLine($"Response Content: {errorContent}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Exception: {ex.Message}");
+        }
+    }
+
+    private async Task DeleteCourseAsync()
+    {
+        try
+        {
+            var query = new GraphQLQuery
+                {
+                    Query = $@"
+                    mutation {{
+                        deleteCourse(id: ""{CourseId}"")
+                    }}"
+                };
+
+            var response = await Http.PostAsJsonAsync("http://localhost:7091/api/graphql", query);
+
+            if (response.IsSuccessStatusCode)
+            {
+                // Course deleted successfully, navigate to a confirmation page
+                NavigationManager.NavigateTo("/courses");
+            }
+            else
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                Console.Error.WriteLine($"Error: {response.StatusCode} - {response.ReasonPhrase}");
+                Console.Error.WriteLine($"Response Content: {errorContent}");
+                // Display error message to the user if deletion fails
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Exception: {ex.Message}");
+        }
+    }
 }

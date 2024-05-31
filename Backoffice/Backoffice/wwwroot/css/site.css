@@ -394,12 +394,15 @@ form .alert {
   background-color: #F5D7DA;
 }
 form .input-group {
-  display: grid;
   margin-bottom: 1rem;
+  padding-top: 10px;
 }
 form .input-group label {
+  position: absolute;
   margin-bottom: 0.188rem;
   font-weight: 700;
+  z-index: 1;
+  bottom: 60px;
 }
 form .input-group input {
   padding: 1rem;
@@ -462,6 +465,34 @@ form .btn-theme-s {
 }
 form .btn-theme-s:hover {
   background-color: #3438ed;
+}
+
+.top-row {
+  background-color: #6366F1;
+}
+
+.nav-scrollable {
+  background-color: #6366F1;
+}
+
+.backoffice-menu {
+  height: 100%;
+}
+.backoffice-menu .container {
+  display: flex;
+  flex-direction: column;
+  padding-top: 1rem;
+  padding-left: 350px;
+}
+.backoffice-menu .container .menu-text {
+  padding-bottom: 20px;
+}
+.backoffice-menu .container .menu-text h1 {
+  padding-bottom: 20px;
+}
+.backoffice-menu .container .menu-buttons {
+  display: flex;
+  gap: 20px;
 }
 
 header {
@@ -1124,6 +1155,22 @@ header .container .btn-mobile {
   width: 75%;
   display: flex;
   justify-content: space-between;
+}
+
+.home .container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-left: 350px;
+  padding-top: 100px;
+}
+.home .container .welcome-text {
+  padding-bottom: 20px p;
+  padding-bottom-color: #B4B7C9;
+}
+.home .container img {
+  height: 50%;
+  width: 50%;
 }
 
 footer {

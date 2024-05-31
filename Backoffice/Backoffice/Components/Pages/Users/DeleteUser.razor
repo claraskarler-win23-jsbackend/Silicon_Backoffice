@@ -1,5 +1,48 @@
-﻿<h3>DeleteUser</h3>
+﻿@page "/users/delete/{userId}"
+
+@rendermode InteractiveAuto
+
+<h3>Delete User</h3>
+
+@if (user == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div>
+        <p><strong>User ID:</strong> @user.Id</p>
+        <p><strong>Name:</strong> @user.FirstName @user.LastName</p>
+        <p><strong>Email:</strong> @user.Email</p>
+        <p><strong>Biography:</strong> @user.Biography</p>
+        <p><strong>Phone:</strong> @user.PhoneNumber</p>
+        <button @onclick="DeleteSelectedUser">Delete User</button>
+    </div>
+}
 
 @code {
+    [Parameter]
+    public string UserId { get; set; }
+    private UserModel? user;
 
+    protected override async Task OnInitializedAsync()
+    {
+        user = await Http.GetFromJsonAsync<UserModel>($"http://localhost:7195/api/getuser/{UserId}");
+    }
+
+    private async Task DeleteSelectedUser()
+    {
+        var response = await Http.DeleteAsync($"http://localhost:7195/api/deleteuser/{UserId}");
+
+        if (response.IsSuccessStatusCode)
+        {
+            Navigation.NavigateTo("/users/view");
+        }
+        else
+        {
+            var errorMessage = await response.Content.ReadAsStringAsync();
+            Console.WriteLine(errorMessage);
+                                             
+        }
+    }
 }

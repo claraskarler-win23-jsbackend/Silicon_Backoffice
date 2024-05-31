@@ -1,0 +1,166 @@
+﻿@page "/courses/{courseId}"
+
+<PageTitle>Manage Course</PageTitle>
+
+<section class="view-course">
+    <div class="container">
+        @if (course != null)
+        {
+            <div class="buttons">
+                <a class="btn-theme" href="/courses/update/@course.Id">Edit this course</a>
+                <a class="btn-theme" href="/courses/delete/@course.Id">Delete this course</a>
+            </div>
+            <div class="course-info">
+
+                <h4>@course.Title</h4>
+                <img src="@course.ImageHeaderUri" alt="@course.Title" />
+
+                <p><strong>Categories:</strong> @string.Join(", ", course.Categories)</p>
+                <p><strong>Description:</strong> @course.Content.Description</p>
+                <p><strong>Includes:</strong></p>
+                <ul>
+                    @foreach (var item in course.Content.Includes)
+                    {
+                        <li>@item</li>
+                    }
+                </ul>
+                <p><strong>Learn Points:</strong></p>
+                <ul>
+                    @foreach (var item in course.Content.LearnPoints)
+                    {
+                        <li>@item</li>
+                    }
+                </ul>
+                <p><strong>Authors:</strong></p>
+                <ul>
+                    @foreach (var author in course.Authors)
+                    {
+                        <li>@author.Name</li>
+                    }
+                </ul>
+                <p><strong>Price:</strong> @course.Prices.Price @course.Prices.Currency</p>
+                <p><strong>Discount:</strong> @course.Prices.Discount</p>
+            </div>
+        }
+        else
+        {
+            <p>Loading...</p>
+
+        }
+
+    </div>
+</section>
+
+@code {
+    [Parameter]
+    public string CourseId { get; set; }
+
+    private Course? course;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var query = new GraphQLQuery
+                {
+                    Query = $@"
+                {{
+                    getCourseById(id: ""{CourseId}"") {{
+                        id
+                        imageHeaderUri
+                        isBestseller
+                        isDigital
+                        categories
+                        title
+                        ingress
+                        starRating
+                        reviews
+                        likesInPercent
+                        likes
+                        hours
+                        authors {{
+                            name
+                            authorImage
+                        }}
+                        prices {{
+                            currency
+                            price
+                            discount
+                        }}
+                        content {{
+                            description
+                            includes
+                            learnPoints
+                            programDetails {{
+                                id
+                                title
+                                description
+                            }}
+                        }}
+                    }}
+                }}"
+                };
+
+            var response = await Http.PostAsJsonAsync("http://localhost:7091/api/graphql", query);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<DynamicGraphQLResponse>();
+                if (result != null)
+                {
+                    var courseData = result.Data.GetProperty("getCourseById");
+                    course = new Course
+                        {
+                            Id = courseData.GetProperty("id").GetString(),
+                            ImageHeaderUri = courseData.GetProperty("imageHeaderUri").GetString(),
+                            IsBestseller = courseData.GetProperty("isBestseller").GetBoolean(),
+                            IsDigital = courseData.GetProperty("isDigital").GetBoolean(),
+                            Categories = courseData.GetProperty("categories").EnumerateArray().Select(c => c.GetString()).ToArray(),
+                            Title = courseData.GetProperty("title").GetString(),
+                            Ingress = courseData.GetProperty("ingress").GetString(),
+                            StarRating = courseData.GetProperty("starRating").GetDecimal(),
+                            Reviews = courseData.GetProperty("reviews").GetString(),
+                            LikesInPercent = courseData.GetProperty("likesInPercent").GetString(),
+                            Likes = courseData.GetProperty("likes").GetString(),
+                            Hours = courseData.GetProperty("hours").GetString(),
+                            Authors = courseData.GetProperty("authors").EnumerateArray().Select(author =>
+                                new Author
+                                {
+                                    Name = author.GetProperty("name").GetString(),
+                                    AuthorImage = author.GetProperty("authorImage").GetString()
+                                }).ToList(),
+                            Prices = new Prices
+                            {
+                                Currency = courseData.GetProperty("prices").GetProperty("currency").GetString(),
+                                Price = courseData.GetProperty("prices").GetProperty("price").GetDecimal(),
+                                Discount = courseData.GetProperty("prices").GetProperty("discount").GetDecimal()
+                            },
+                            Content = new Content
+                            {
+                                Description = courseData.GetProperty("content").GetProperty("description").GetString(),
+                                Includes = courseData.GetProperty("content").GetProperty("includes").EnumerateArray().Select(i => i.GetString()).ToArray(),
+                                LearnPoints = courseData.GetProperty("content").GetProperty("learnPoints").EnumerateArray().Select(i => i.GetString()).ToArray(),
+                                ProgramDetails = courseData.GetProperty("content").GetProperty("programDetails").EnumerateArray()
+                                        .Select(detail => new ProgramDetailItem
+                                        {
+                                            Id = detail.GetProperty("id").GetInt32(),
+                                            Title = detail.GetProperty("title").GetString(),
+                                            Description = detail.GetProperty("description").GetString()
+                                        }).ToList()
+                            }
+                        };
+                }
+            }
+            else
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                Console.Error.WriteLine($"Error: {response.StatusCode} - {response.ReasonPhrase}");
+                Console.Error.WriteLine($"Response Content: {errorContent}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Exception: {ex.Message}");
+        }
+    }
+}
