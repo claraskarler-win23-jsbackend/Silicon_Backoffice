@@ -66,7 +66,7 @@
                 </div>
                 <div id="form-terms" class="checkbox">
                     <div class="checkbox-group">
-                        <InputCheckbox type="terms" @bind-Value="Input.TermsAndConditions" class="form-control" autocomplete="terms" aria-required="true" />
+                        <InputCheckbox type="terms" @bind-Value="Input.TermsAndConditions" autocomplete="terms" aria-required="true" />
                         <label>I agree to the <a>Terms</a> & <a>Conditions</a>.</label>
                     </div>
                     <ValidationMessage For="() => Input.TermsAndConditions" class="text-danger" />

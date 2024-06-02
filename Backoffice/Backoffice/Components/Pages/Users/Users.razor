@@ -1,34 +1,37 @@
 ﻿@page "/users"
 @using Backoffice.Data
 @inject HttpClient Http
+@attribute [Authorize]
 
 
 @attribute [StreamRendering]
 
 <PageTitle>All users</PageTitle>
 
-<h1>Users</h1>
+<div class="container">
+    <h1>Users</h1>
 
-<p>This is a list of all Silicon Users</p>
+    <p>This is a list of all Silicon Users</p>
 
-@if (users == null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
-    @foreach (var user in users)
+    @if (users == null)
     {
-        <div class="mb-3">
-            <h3>@user.FirstName @user.LastName</h3>
-            <p><strong>Email:</strong> @user.Email</p>
-            <p><strong>Biography:</strong> @user.Biography</p>
-            <p><strong>Phone:</strong> @user.PhoneNumber</p>
-            <a class="btn-theme" href="/users/update/@user.Id">Edit User</a>
-            <a class="btn-theme" href="/users/delete/@user.Id">Delete User</a>
-        </div>
+        <p><em>Loading...</em></p>
     }
-}
+    else
+    {
+        @foreach (var user in users)
+        {
+            <div class="mb-3">
+                <h3>@user.FirstName @user.LastName</h3>
+                <p><strong>Email:</strong> @user.Email</p>
+                <p><strong>Biography:</strong> @user.Biography</p>
+                <p><strong>Phone:</strong> @user.PhoneNumber</p>
+                <a class="btn-theme" href="/users/update/@user.Id">Update User</a>
+                <a class="btn-theme" href="/users/delete/@user.Id">Delete User</a>
+            </div>
+        }
+    }
+</div>
 
 @code {
     private UserModel[]? users;

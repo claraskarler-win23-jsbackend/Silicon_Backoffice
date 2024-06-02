@@ -1,4 +1,7 @@
 ﻿@page "/users/delete/{userId}"
+@using System.ComponentModel.DataAnnotations
+@attribute [Authorize]
+@using Backoffice.Helpers
 
 @rendermode InteractiveAuto
 
@@ -10,20 +13,27 @@
 }
 else
 {
-    <div>
+    <EditForm method="post" FormName="DeleteForm" Model="@deleteForm" OnValidSubmit="DeleteSelectedUser">
         <p><strong>User ID:</strong> @user.Id</p>
         <p><strong>Name:</strong> @user.FirstName @user.LastName</p>
         <p><strong>Email:</strong> @user.Email</p>
         <p><strong>Biography:</strong> @user.Biography</p>
         <p><strong>Phone:</strong> @user.PhoneNumber</p>
-        <button @onclick="DeleteSelectedUser">Delete User</button>
-    </div>
+        <div class="checkbox-group">
+            <div class="input-group">
+                <InputCheckbox @bind-Value="deleteForm.Confirm" />
+                <label for="confirm">Please check this box to confirm the deletion of this user</label>
+            </div>
+        </div>
+        <button class="btn btn-danger" type="submit">Delete User</button>
+    </EditForm>
 }
 
 @code {
     [Parameter]
     public string UserId { get; set; }
     private UserModel? user;
+    private DeleteForm deleteForm = new DeleteForm();
 
     protected override async Task OnInitializedAsync()
     {
@@ -42,7 +52,12 @@ else
         {
             var errorMessage = await response.Content.ReadAsStringAsync();
             Console.WriteLine(errorMessage);
-                                             
         }
+    }
+
+    public class DeleteForm
+    {
+        [CheckBoxRequired(ErrorMessage = "You must confirm to delete this user")]
+        public bool Confirm { get; set; }
     }
 }

@@ -1,5 +1,57 @@
-﻿<h3>DeleteAdmin</h3>
+﻿@page "/admin/delete"
+@attribute [Authorize]
+
+@using Backoffice.Services
+@using System.ComponentModel.DataAnnotations
+@inject AdminService AdminService
+@inject NavigationManager NavigationManager
+
+<h3>Delete Admin</h3>
+
+<div class="container">
+    <EditForm Model="@deleteForm" OnValidSubmit="DeleteAdminAsync" FormName="DeleteForm">
+        <label>Email of Admin to Delete:</label>
+        <InputText @bind-Value="deleteForm.Email" />
+        <ValidationMessage For="@(() => deleteForm.Email)" />
+
+        <div class="checkbox-group">
+            <InputCheckbox @bind-Value="deleteForm.Confirm" />
+            <label for="confirmDelete">Confirm deletion</label>
+        </div>
+        <ValidationMessage For="@(() => deleteForm.Confirm)" />
+
+        <button type="submit" class="btn btn-danger">Delete Admin</button>
+    </EditForm>
+</div>
 
 @code {
+    private DeleteForm deleteForm = new DeleteForm();
 
+    private async Task DeleteAdminAsync()
+    {
+        try
+        {
+            if (!deleteForm.Confirm)
+            {
+                return;
+            }
+
+            await AdminService.DeleteAdminAsync(deleteForm.Email);
+            NavigationManager.NavigateTo("/admin/view");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error deleting admin: {ex.Message}");
+        }
+    }
+
+    public class DeleteForm
+    {
+        [Required(ErrorMessage = "You must confirm to delete this user")]
+        public bool Confirm { get; set; }
+
+        [Required(ErrorMessage = "Email is required")]
+        [EmailAddress(ErrorMessage = "Invalid email format")]
+        public string Email { get; set; }
+    }
 }

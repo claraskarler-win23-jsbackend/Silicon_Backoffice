@@ -2,6 +2,7 @@ using Backoffice;
 using Backoffice.Client.Pages;
 using Backoffice.Components;
 using Backoffice.Data;
+using Backoffice.Services;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -15,6 +16,7 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<AuthenticationStateProvider, PersistingRevalidatingAuthenticationStateProvider>();
+builder.Services.AddScoped<AdminService>();
 builder.Services.AddHttpClient();
 
 builder.Services.AddAuthentication(options =>

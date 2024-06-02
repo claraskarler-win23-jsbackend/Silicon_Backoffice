@@ -1,5 +1,6 @@
 ﻿@page "/courses/delete/{CourseId}"
 @inject NavigationManager NavigationManager
+@attribute [Authorize]
 
 <h3>Delete Course</h3>
 
@@ -87,15 +88,13 @@ else
 
             if (response.IsSuccessStatusCode)
             {
-                // Course deleted successfully, navigate to a confirmation page
-                NavigationManager.NavigateTo("/courses");
+                NavigationManager.NavigateTo("/courses/view");
             }
             else
             {
                 var errorContent = await response.Content.ReadAsStringAsync();
                 Console.Error.WriteLine($"Error: {response.StatusCode} - {response.ReasonPhrase}");
                 Console.Error.WriteLine($"Response Content: {errorContent}");
-                // Display error message to the user if deletion fails
             }
         }
         catch (Exception ex)

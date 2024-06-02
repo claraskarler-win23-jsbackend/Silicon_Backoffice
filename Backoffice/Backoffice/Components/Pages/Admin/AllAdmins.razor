@@ -1,5 +1,38 @@
-﻿<h3>AllAdmins</h3>
+﻿@page "/admin/view"
+@attribute [Authorize]
+
+@using Backoffice.Services
+@inject AdminService AdminService
+
+<div class="container">
+    <h1>All Admins</h1>
+
+    <p>This is a list of all Silicon Admins</p>
+
+    @if (admins == null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        @foreach (var admin in admins)
+        {
+            <div class="mb-3">
+                <h3>@admin.FirstName @admin.LastName</h3>
+                <p><strong>Email:</strong> @admin.Email</p>
+                <p><strong>Role:</strong> @admin.Role</p>
+            </div>
+        }
+    }
+</div>
+
 
 @code {
+    private List<AdminModel>? admins;
 
+
+    protected override async Task OnInitializedAsync()
+    {
+        admins = await AdminService.GetAllAdminsAsync();
+    }
 }

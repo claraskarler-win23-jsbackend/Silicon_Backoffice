@@ -4,6 +4,7 @@
 @using System.Net
 @using System.ComponentModel.DataAnnotations
 @inject NavigationManager Navigation
+@attribute [Authorize]
 
 <PageTitle>Create Course</PageTitle>
 
@@ -90,19 +91,17 @@
 
             if (response.IsSuccessStatusCode)
             {
-                // Course created successfully
                 Navigation.NavigateTo("/courses");
             }
             else
             {
-                // Handle error scenario
                 var errorMessage = await response.Content.ReadAsStringAsync();
-                // Show error message to the user
+
             }
         }
         catch (Exception ex)
         {
-            // Handle exception
+
         }
     }
 

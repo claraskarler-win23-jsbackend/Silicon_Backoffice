@@ -1,4 +1,5 @@
 ﻿@page "/courses/{courseId}"
+@attribute [Authorize]
 
 <PageTitle>Manage Course</PageTitle>
 
@@ -6,10 +7,6 @@
     <div class="container">
         @if (course != null)
         {
-            <div class="buttons">
-                <a class="btn-theme" href="/courses/update/@course.Id">Edit this course</a>
-                <a class="btn-theme" href="/courses/delete/@course.Id">Delete this course</a>
-            </div>
             <div class="course-info">
 
                 <h4>@course.Title</h4>
@@ -40,6 +37,10 @@
                 </ul>
                 <p><strong>Price:</strong> @course.Prices.Price @course.Prices.Currency</p>
                 <p><strong>Discount:</strong> @course.Prices.Discount</p>
+            </div>
+            <div class="buttons">
+                <a class="btn-theme" href="/courses/update/@course.Id">Edit this course</a>
+                <a class="btn-theme" href="/courses/delete/@course.Id">Delete this course</a>
             </div>
         }
         else
